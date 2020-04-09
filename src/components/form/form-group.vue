@@ -1,12 +1,14 @@
 <template>
-  <div class="cube-form-group">
-    <p class="cube-form-group-legend">{{ legend }}</p>
-    <div class="cube-form-group-content">
+  <div class="fd-form-group">
+    <p class="fd-form-group-legend">{{ legend }}</p>
+    <div class="fd-form-group-content">
       <slot>
-        <cube-form-item
+        <fd-form-item
           v-for="(field, index) in fields"
           :key="field.key || index"
           :field="field"
+          v-bind="$attrs"
+          v-on="$listeners"
         />
       </slot>
     </div>
@@ -14,14 +16,14 @@
 </template>
 
 <script>
-import CubeFormItem from './form-item.vue'
-
-const COMPONENT_NAME = 'cube-form-group'
+import FdFormItem from './form-item.vue'
+const COMPONENT_NAME = 'fd-form-group'
 export default {
   name: COMPONENT_NAME,
   components: {
-    CubeFormItem
+    FdFormItem
   },
+  inheritAttrs: false,
   props: {
     legend: {
       type: String,
@@ -34,12 +36,7 @@ export default {
         return []
       }
     }
-  },
-  beforeCreate() {
-    this.form = this.$parent.form
-  },
-  beforeDestroy() {
-    this.form = null
   }
 }
 </script>
+

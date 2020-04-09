@@ -1,41 +1,33 @@
 <template>
-  <form ref="form" class="cube-form" :class="formClass" :action="action" @submit="submitHandler" @reset="resetHandler">
-    <slot>
-      <cube-form-group
-        v-for="(group, index) in groups"
-        :key="group.key || index"
-        :fields="group.fields"
-        :legend="group.legend"
-      />
-    </slot>
-  </form>
+  <div class="fd-form">
+    <el-form
+      ref="form"
+      :model="model"
+      :label-width="labelWidth"
+      class="fd-ruleForm"
+    >
+      <slot>
+        <fd-form-group
+          v-for="(group, index) in groups"
+          :key="group.key || index"
+          :fields="group.fields"
+          :legend="group.legend"
+          :model="model"
+        />
+      </slot>
+    </el-form>
+  </div>
 </template>
 
 <script>
-import { dispatchEvent } from '../../common/helpers/dom'
-import { cb2PromiseWithResolve } from '../../common/helpers/util'
-import CubeFormGroup from './form-group.vue'
-import LAYOUTS from './layouts'
-import mixin from './mixin'
-
-const COMPONENT_NAME = 'cube-form'
-const EVENT_SUBMIT = 'submit'
-const EVENT_RESET = 'reset'
-const EVENT_VALIDATE = 'validate'
-const EVENT_VALID = 'valid'
-const EVENT_INVALID = 'invalid'
-
+import FdFormGroup from './form-group.vue'
+const COMPONENT_NAME = 'fd-form'
 export default {
   name: COMPONENT_NAME,
   components: {
-    CubeFormGroup
+    FdFormGroup
   },
-  mixins: [mixin],
   props: {
-    action: {
-      type: String,
-      default: ''
-    },
     model: {
       type: Object,
       default() {
@@ -50,42 +42,25 @@ export default {
         return {}
       }
     },
-    options: {
-      type: Object,
-      default() {
-        return {
-          scrollToInvalidField: false,
-          layout: LAYOUTS.STANDARD
-        }
-      }
-    },
-    immediateValidate: {
-      type: Boolean,
-      default: false
-    },
-    submitAlwaysValidate: {
-      type: Boolean,
-      default: false
+    labelWidth: {
+      type: String,
+      default: '154px'
     }
   },
   data() {
     return {
-      validatedCount: 0,
-      dirty: false,
-      firstInvalidField: null,
-      firstInvalidFieldIndex: -1
+      ruleForm: {
+        name: ''
+      },
+      rules: {
+        name: [
+          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ]
+      }
     }
   },
   computed: {
-    fieldsModel() {
-      const model = {}
-      this.fields.forEach((fieldComponent) => {
-        if (!fieldComponent.isBtnField) {
-          model[fieldComponent.fieldValue.modelKey] = fieldComponent.modelValue
-        }
-      })
-      return model
-    },
     groups() {
       const schema = this.schema
       const groups = schema.groups || []
@@ -95,250 +70,28 @@ export default {
         })
       }
       return groups
-    },
-    fieldsData() {
-      return this.groups.reduce((fields, group) => {
-        group.fields.reduce((fields, field) => {
-          fields.push(field)
-          return fields
-        }, fields)
-        return fields
-      }, [])
-    },
-    layout() {
-      const options = this.options
-      const layout = (options && options.layout) || LAYOUTS.STANDARD
-      return layout
-    },
-    formClass() {
-      const invalid = this.invalid
-      const valid = this.valid
-      const layout = this.layout
-      return {
-        'cube-form_standard': layout === LAYOUTS.STANDARD,
-        'cube-form_groups': this.groups.length > 1,
-        'cube-form_validating': this.validating,
-        'cube-form_pending': this.pending,
-        'cube-form_valid': valid,
-        'cube-form_invalid': invalid,
-        'cube-form_classic': layout === LAYOUTS.CLASSIC,
-        'cube-form_fresh': layout === LAYOUTS.FRESH
-      }
     }
-  },
-  watch: {
-    validatedCount() {
-      this.$emit(EVENT_VALIDATE, {
-        validity: this.validity,
-        valid: this.valid,
-        invalid: this.invalid,
-        dirty: this.dirty,
-        firstInvalidFieldIndex: this.firstInvalidFieldIndex
-      })
-    }
-  },
-  beforeCreate() {
-    this.form = this
-    this.fields = []
-    this.validity = {}
-  },
-  mounted() {
-    if (this.immediateValidate) {
-      this.validate()
-    }
-  },
-  beforeDestroy() {
-    this.form = null
-    this.firstInvalidField = null
   },
   methods: {
-    submit(skipValidate = false) {
-      this.skipValidate = skipValidate
-      dispatchEvent(this.$refs.form, 'submit')
-      this.skipValidate = false
-    },
-    reset() {
-      dispatchEvent(this.$refs.form, 'reset')
-    },
-    submitHandler(e) {
-      // sync all fields value because of trigger: blur or debounce
-      this.syncValidatorValues()
-      if (this.skipValidate) {
-        this.$emit(EVENT_SUBMIT, e, this.model, this.fieldsModel)
-        return
-      }
-      const submited = (submitResult) => {
-        if (submitResult) {
-          this.$emit(EVENT_VALID, this.validity)
-          this.$emit(EVENT_SUBMIT, e, this.model, this.fieldsModel)
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          alert('submit!')
         } else {
-          // scrollToInvalidField
-          if (this.options.scrollToInvalidField && this.firstInvalidField) {
-            this.firstInvalidField.$el.scrollIntoView()
-          }
-          e.preventDefault()
-          this.$emit(EVENT_INVALID, this.validity)
-        }
-      }
-      if (this.submitAlwaysValidate || this.valid === undefined) {
-        this._submit(submited)
-        if (this.validating || this.pending) {
-          // async validate
-          e.preventDefault()
-        }
-      } else {
-        submited(this.valid)
-      }
-    },
-    resetHandler(e) {
-      this._reset()
-      this.$emit(EVENT_RESET, e)
-    },
-    _submit(cb) {
-      this.validate(() => {
-        cb && cb(this.valid)
-      })
-    },
-    _reset() {
-      this.fields.forEach((fieldComponent) => {
-        fieldComponent.reset()
-      })
-      this.setValidity()
-      this.setValidating()
-      this.setPending()
-    },
-    syncValidatorValues() {
-      this.fields.forEach((fieldComponent) => {
-        fieldComponent.syncValidatorValue()
-      })
-    },
-    validate(cb) {
-      const promise = cb2PromiseWithResolve(cb)
-      if (promise) {
-        cb = promise.resolve
-      }
-      let doneCount = 0
-      const len = this.fields.length
-      this.originValid = undefined
-      this.fields.forEach((fieldComponent) => {
-        fieldComponent.validate(() => {
-          doneCount++
-          if (doneCount === len) {
-            // all done
-            cb && cb(this.valid)
-          }
-        })
-      })
-      return promise
-    },
-    updateValidating() {
-      const validating = this.fields.some((fieldComponent) => fieldComponent.validating)
-      this.setValidating(validating)
-    },
-    updatePending() {
-      const pending = this.fields.some((fieldComponent) => fieldComponent.pending)
-      this.setPending(pending)
-    },
-    setValidating(validating = false) {
-      this.validating = validating
-    },
-    setPending(pending = false) {
-      this.pending = pending
-    },
-    updateValidity(modelKey, valid, result, dirty) {
-      const curResult = this.validity[modelKey]
-      if (curResult && curResult.valid === valid && curResult.result === result && curResult.dirty === dirty) {
-        return
-      }
-      this.setValidity(modelKey, {
-        valid,
-        result,
-        dirty
-      })
-    },
-    setValidity(key, val) {
-      const validity = {}
-      if (key) {
-        Object.assign(validity, this.validity)
-        if (val === undefined) {
-          delete validity[key]
-        } else {
-          validity[key] = val
-        }
-      }
-
-      let dirty = false
-      let invalid = false
-      let valid = true
-      let firstInvalidFieldKey = ''
-      this.fields.forEach((fieldComponent) => {
-        const modelKey = fieldComponent.fieldValue.modelKey
-        if (modelKey) {
-          const retVal = validity[modelKey]
-          if (retVal) {
-            if (retVal.dirty) {
-              dirty = true
-            }
-            if (retVal.valid === false) {
-              valid = false
-            } else if (valid && !retVal.valid) {
-              valid = retVal.valid
-            }
-
-            if (!invalid && retVal.valid === false) {
-              // invalid
-              invalid = true
-              firstInvalidFieldKey = modelKey
-            }
-          } else if (fieldComponent.hasRules) {
-            if (valid) {
-              valid = undefined
-            }
-            validity[modelKey] = {
-              valid: undefined,
-              result: {},
-              dirty: false
-            }
-          }
-        }
-      })
-      this.validity = validity
-      this.dirty = dirty
-      this.originValid = valid
-      this.setFirstInvalid(firstInvalidFieldKey)
-      this.validatedCount++
-    },
-    setFirstInvalid(key) {
-      if (!key) {
-        this.firstInvalidField = null
-        this.firstInvalidFieldIndex = -1
-        return
-      }
-      this.fields.some((fieldComponent, index) => {
-        if (fieldComponent.fieldValue.modelKey === key) {
-          this.firstInvalidField = fieldComponent
-          this.firstInvalidFieldIndex = index
-          return true
+          console.log('error submit!!')
+          return false
         }
       })
     },
-    addField(fieldComponent) {
-      const i = this.fieldsData.indexOf(fieldComponent.field)
-      this.fields.splice(i, 0, fieldComponent)
-      const modelKey = fieldComponent.fieldValue.modelKey
-      modelKey && this.setValidity(modelKey)
-    },
-    destroyField(fieldComponent) {
-      const i = this.fields.indexOf(fieldComponent)
-      this.fields.splice(i, 1)
-      const modelKey = fieldComponent.fieldValue.modelKey
-      modelKey && this.setValidity(modelKey)
+    resetForm(formName) {
+      this.$refs[formName].resetFields()
     }
   }
 }
 </script>
-
-<style lang="scss">
-  // @import "../../common/styles/variable.scss";
-  // @import "../../common/styles/mixin.scss";
+<style lang="scss" scoped>
+.fd-form{
+  background-color: #fff;
+}
 </style>
+
