@@ -1,7 +1,7 @@
 <template>
   <div ref="formItem" class="fd-form-item">
     <template v-if="!isBtnField">
-      <div>
+      <div class="fd-form-item-row">
         <el-form-item
           :rules="fieldValue.rules"
           :prop="fieldValue.modelKey"
@@ -42,11 +42,7 @@ export default {
     const modelValue = modelKey ? model[modelKey] : null
     return {
       model: this.$attrs.model,
-      modelValue: modelValue,
-      ruleForm: {
-        name: ''
-      },
-      errorMsg: '123'
+      modelValue: modelValue
     }
   },
   computed: {
@@ -84,24 +80,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.fd-form-item{
-  .el-form-item.is-required:not(.is-no-asterisk)>.el-form-item__label:before, .el-form-item.is-required:not(.is-no-asterisk) .el-form-item__label-wrap>.el-form-item__label:before {
-    content: '';
-    color: #ff4949;
-    margin-right: 4px;
-  }
-  .el-form-item.is-required:not(.is-no-asterisk)>.el-form-item__label:after, .el-form-item.is-required:not(.is-no-asterisk) .el-form-item__label-wrap>.el-form-item__label:after {
-    content: '*';
-    color: #ff4949;
-    margin-left: 4px;
-  }
-  .fd-form-field{
-    position: relative;
-    .fd-form-field-error{
-      position: absolute;
-    }
-  }
-}
-</style>

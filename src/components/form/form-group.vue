@@ -1,6 +1,6 @@
 <template>
   <div class="fd-form-group">
-    <p class="fd-form-group-legend">{{ legend }}</p>
+    <p v-if="legend" class="fd-form-group-legend">{{ legend }}</p>
     <div class="fd-form-group-content">
       <slot>
         <fd-form-item
@@ -39,4 +39,3 @@ export default {
   }
 }
 </script>
-

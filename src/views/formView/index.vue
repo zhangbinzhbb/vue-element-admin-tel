@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="form-container">
     <fd-form
       :model="model"
       :schema="schema"
@@ -17,7 +17,9 @@ export default {
       validity: {},
       valid: undefined,
       model: {
-        inputValue: '222'
+        inputValue: '',
+        inputValue1: '',
+        inputValue2: ''
       },
       schema: {
         groups: [
@@ -34,6 +36,37 @@ export default {
                 rules: [
                   { required: true, message: '请输入邮箱地址', trigger: 'blur' },
                   { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
+                ],
+                // validating when blur
+                trigger: 'blur'
+              },
+              {
+                type: 'input',
+                modelKey: 'inputValue1',
+                label: 'Input1',
+                props: {
+                  placeholder: '请输入'
+                },
+                rules: [
+                  { required: true, message: '请输入', trigger: 'blur' }
+                ],
+                // validating when blur
+                trigger: 'blur'
+              }
+            ]
+          },
+          {
+            legend: '',
+            fields: [
+              {
+                type: 'input',
+                modelKey: 'inputValue2',
+                label: 'Input2',
+                props: {
+                  placeholder: '请输入'
+                },
+                rules: [
+                  { required: true, message: '请输入', trigger: 'blur' }
                 ],
                 // validating when blur
                 trigger: 'blur'
@@ -65,3 +98,11 @@ export default {
 }
 
 </script>
+
+<style lang="scss" scoped>
+.form-container{
+  padding: 40px;
+  background-color: #fff;
+}
+</style>
+
