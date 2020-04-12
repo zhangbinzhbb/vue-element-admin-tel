@@ -16,6 +16,10 @@
         />
       </slot>
     </el-form>
+    <div class="fd-form-button-group">
+      <el-button type="primary" @click="submitForm('form')">立即创建</el-button>
+      <el-button @click="resetForm('form')">重置</el-button>
+    </div>
   </div>
 </template>
 
@@ -93,6 +97,12 @@ export default {
 .fd-form{
   background-color: #fff;
   border: 1px solid #d8d8d8;
+  position: relative;
+  .fd-form-button-group{
+    position: absolute;
+    right: 0;
+    bottom: -54px;
+  }
   .fd-form-group{
     &+.fd-form-group{
        border-top: 1px solid #d8d8d8;
@@ -111,6 +121,7 @@ export default {
         }
         .fd-form-item-row{
           width: 100%;
+          height: 100%;
         }
         .el-form-item.is-required:not(.is-no-asterisk)>.el-form-item__label:before, .el-form-item.is-required:not(.is-no-asterisk) .el-form-item__label-wrap>.el-form-item__label:before {
           content: '';
@@ -124,6 +135,7 @@ export default {
         }
         .el-form-item{
           margin-bottom:0px;
+          height: 100%;
         }
         .el-form-item__label {
           height: 52px;
@@ -151,9 +163,21 @@ export default {
           }
         }
       }
+      .fd-form-item_textarea{
+        .el-form-item__label {
+          min-height: 52px !important;
+          height: 100% !important;
+          line-height: inherit!important;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+        }
+        .fd-form-field {
+          padding: 7px 9px 7px 16px!important;
+        }
+      }
     }
   }
-
 }
 </style>
 

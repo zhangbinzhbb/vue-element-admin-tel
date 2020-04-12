@@ -4,6 +4,7 @@
       :model="model"
       :schema="schema"
     />
+    {{ model }}
   </div>
 </template>
 
@@ -19,7 +20,12 @@ export default {
       model: {
         inputValue: '',
         inputValue1: '',
-        inputValue2: ''
+        inputValue2: '',
+        inputValue3: '',
+        selectValue: '',
+        radioValue: '',
+        checkboxValue: ['1'],
+        timePickerValue: ''
       },
       schema: {
         groups: [
@@ -70,6 +76,190 @@ export default {
                 ],
                 // validating when blur
                 trigger: 'blur'
+              }
+            ]
+          },
+          {
+            legend: '',
+            fields: [
+              {
+                type: 'select',
+                modelKey: 'selectValue',
+                label: 'select',
+                props: {
+                  options: [
+                    {
+                      value: '1',
+                      label: '黄金糕'
+                    }, {
+                      value: '2',
+                      label: '双皮奶'
+                    }
+                  ],
+                  fileType: {
+                    value: 'value',
+                    label: 'label'
+                  },
+                  placeholder: 'xx',
+                  disabled: false,
+                  clearable: true
+                },
+                rules: [
+                  { required: true, message: '请选择', trigger: 'change' }
+                ],
+                // validating when blur
+                trigger: 'blur'
+              }
+            ]
+          },
+          {
+            legend: '',
+            fields: [
+              {
+                type: 'textarea',
+                modelKey: 'inputValue3',
+                label: 'Input3',
+                props: {
+                  placeholder: '请输入',
+                  rows: '3'
+                  // autosize: true
+                },
+                rules: [
+                  { required: true, message: '请输入', trigger: 'blur' }
+                ],
+                // validating when blur
+                trigger: 'blur'
+              }
+            ]
+          },
+          {
+            legend: '',
+            fields: [
+              {
+                type: 'select',
+                modelKey: 'selectValue',
+                label: 'select',
+                props: {
+                  options: [
+                    {
+                      value: '1',
+                      label: '黄金糕'
+                    }, {
+                      value: '2',
+                      label: '双皮奶'
+                    }
+                  ],
+                  fileType: {
+                    value: 'value',
+                    label: 'label'
+                  },
+                  placeholder: 'xx',
+                  disabled: false,
+                  clearable: true
+                },
+                rules: [
+                  { required: true, message: '请选择', trigger: 'change' }
+                ],
+                // validating when blur
+                trigger: 'blur'
+              },
+              {
+                type: 'radio-group',
+                modelKey: 'radioValue',
+                label: 'radioGroup',
+                props: {
+                  options: [
+                    {
+                      value: '1',
+                      label: '黄金糕'
+                    }, {
+                      value: '2',
+                      label: '双皮奶'
+                    }
+                  ]
+                },
+                rules: [
+                  { required: true, message: '请选择活动资源', trigger: 'change' }
+                ]
+              }
+            ]
+          },
+          {
+            legend: '',
+            fields: [
+              {
+                type: 'select',
+                modelKey: 'selectValue',
+                label: 'select',
+                props: {
+                  options: [
+                    {
+                      value: '1',
+                      label: '黄金糕'
+                    }, {
+                      value: '2',
+                      label: '双皮奶'
+                    }
+                  ],
+                  fileType: {
+                    value: 'value',
+                    label: 'label'
+                  },
+                  placeholder: 'xx',
+                  disabled: false,
+                  clearable: true
+                },
+                rules: [
+                  { required: true, message: '请选择', trigger: 'change' }
+                ],
+                // validating when blur
+                trigger: 'blur'
+              },
+              {
+                type: 'checkbox-group',
+                modelKey: 'checkboxValue',
+                label: 'checkboxGroup',
+                props: {
+                  options: [
+                    {
+                      value: '1',
+                      label: '黄金糕'
+                    }, {
+                      value: '2',
+                      label: '双皮奶'
+                    }
+                  ]
+                },
+                rules: []
+              }
+            ]
+          },
+          {
+            legend: '',
+            fields: [
+              {
+                type: 'time-picker',
+                modelKey: 'timePickerValue',
+                label: 'timePicker',
+                props: {},
+                rules: []
+              },
+              {
+                type: 'checkbox-group',
+                modelKey: 'checkboxValue',
+                label: 'checkboxGroup',
+                props: {
+                  options: [
+                    {
+                      value: '1',
+                      label: '黄金糕'
+                    }, {
+                      value: '2',
+                      label: '双皮奶'
+                    }
+                  ]
+                },
+                rules: []
               }
             ]
           }

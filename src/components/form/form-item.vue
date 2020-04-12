@@ -1,5 +1,5 @@
 <template>
-  <div ref="formItem" class="fd-form-item">
+  <div ref="formItem" class="fd-form-item" :class="formItemClass">
     <template v-if="!isBtnField">
       <div class="fd-form-item-row">
         <el-form-item
@@ -67,6 +67,12 @@ export default {
         return fdType
       }
       return type
+    },
+    formItemClass() {
+      const fieldValue = this.fieldValue
+      return {
+        'fd-form-item_textarea': fieldValue.type === 'textarea'
+      }
     }
   },
   watch: {

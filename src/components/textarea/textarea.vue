@@ -19,7 +19,7 @@
 <script type="text/ecmascript-6">
 /* eslint-disable */
 import inputMixin from '../../common/mixins/input'
-const COMPONENT_NAME = 'fd-input'
+const COMPONENT_NAME = 'fd-textarea'
 const EVENT_INPUT = 'input'
 const EVENT_BLUR = 'blur'
 const EVENT_FOCUS = 'focus'
@@ -31,7 +31,7 @@ export default {
     value: [String, Number],
     type: {
       type: String,
-      default: 'text'
+      default: 'textarea'
     },
     disabled: {
       type: Boolean,
